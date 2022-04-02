@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Project.Service.MovieServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,24 @@ namespace Project.Api.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IMovieService _movieService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger
+            , IMovieService movieService)
         {
             _logger = logger;
+            this._movieService = movieService;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            this._movieService.Insert(new Data.Domain.MovieDomains.Movie
+            {
+                Title = "test",
+                InsertDateTime = DateTime.Now
+            });
+
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

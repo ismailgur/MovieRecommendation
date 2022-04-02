@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Api", "Project.Api\Project.Api.csproj", "{D44EE679-977B-431A-BB97-2EC7910C767C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Api", "Project.Api\Project.Api.csproj", "{D44EE679-977B-431A-BB97-2EC7910C767C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.TaskManager", "Project.TaskManager\Project.TaskManager.csproj", "{DAD08EDA-09A6-458A-8582-27B7EC2D73CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.TaskManager", "Project.TaskManager\Project.TaskManager.csproj", "{DAD08EDA-09A6-458A-8582-27B7EC2D73CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Service", "Project.Service\Project.Service.csproj", "{6C968517-4B7E-4476-99C7-71209B8237F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Service", "Project.Service\Project.Service.csproj", "{6C968517-4B7E-4476-99C7-71209B8237F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Data", "Project.Data\Project.Data.csproj", "{F004BA34-5582-4AF0-984F-6C9F8F38C6C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Data", "Project.Data\Project.Data.csproj", "{F004BA34-5582-4AF0-984F-6C9F8F38C6C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Common", "Project.Common\Project.Common.csproj", "{4C004616-A968-44F8-BC64-37109C33729A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Common", "Project.Common\Project.Common.csproj", "{4C004616-A968-44F8-BC64-37109C33729A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.UnitTest", "Project.UnitTest\Project.UnitTest.csproj", "{6FE4694D-4CE7-4AB6-824F-4DC536E5E1FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.UnitTest", "Project.UnitTest\Project.UnitTest.csproj", "{6FE4694D-4CE7-4AB6-824F-4DC536E5E1FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
