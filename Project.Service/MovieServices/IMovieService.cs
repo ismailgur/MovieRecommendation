@@ -9,10 +9,5 @@ namespace Project.Service.MovieServices
 {
     public interface IMovieService
     {
-        Movie FindByIntegrationId(long id);
-
-        Movie Insert(Movie model);
-
-        void Test();
     }
 }

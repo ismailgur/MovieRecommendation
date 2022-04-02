@@ -18,6 +18,12 @@ namespace Project.Data.Domain.Account
 
         public string Email { get; set; }
 
+        public string Username { get; set; }
+
+        public virtual UserToken UserToken { get; set; }
+
+        public string SerialNumber { get; set; }
+
         public DateTime InsertDateTime { get; set; }
 
         public DateTime? UpdateDateTime { get; set; }
