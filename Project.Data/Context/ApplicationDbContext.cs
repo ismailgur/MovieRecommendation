@@ -22,7 +22,7 @@ namespace Project.Data.Context
 
 
         public new DbSet<TEntity> Set<TEntity>() where TEntity : class
-        {
+        {           
             return base.Set<TEntity>();
         }
 

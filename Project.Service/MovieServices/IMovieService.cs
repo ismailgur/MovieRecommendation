@@ -10,5 +10,7 @@ namespace Project.Service.MovieServices
     public interface IMovieService
     {
         Movie Insert(Movie model);
+
+        void Test();
     }
 }

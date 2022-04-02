@@ -42,7 +42,7 @@ namespace Project.Api
 
             services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
 
-            DomainInjections(services);
+            ServiceInjections(services);
 
 
             services.AddControllers();
@@ -75,9 +75,8 @@ namespace Project.Api
         }
 
 
-        private void DomainInjections(IServiceCollection services)
+        private void ServiceInjections(IServiceCollection services)
         {
-
             services.AddScoped<IMovieService, MovieService>();
         }
     }

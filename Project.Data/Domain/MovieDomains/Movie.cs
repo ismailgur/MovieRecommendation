@@ -10,6 +10,13 @@ namespace Project.Data.Domain.MovieDomains
     {
         public string Title { get; set; }
 
+        public string OriginalTitle { get; set; }
+
+        public int IntegrationId { get; set; }
+
+        public string Overview { get; set; }
+
+
         public DateTime InsertDateTime { get; set; }
 
         public DateTime? UpdateDateTime { get; set; }
