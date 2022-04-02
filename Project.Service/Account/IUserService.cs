@@ -11,6 +11,10 @@ namespace Project.Service.Account
     {
         Task<User> FindUserAsync(long userId);
 
+        Task<User> FindUserAsync(string username, string password);
+
         Task UpdateUserLastActivityDateAsync(User user);
+
+        User Insert(User model);
     }
 }

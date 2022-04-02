@@ -24,6 +24,8 @@ namespace Project.Data.Domain.Account
 
         public string SerialNumber { get; set; }
 
+        public string Password { get; set; }
+
         public DateTime InsertDateTime { get; set; }
 
         public DateTime? UpdateDateTime { get; set; }

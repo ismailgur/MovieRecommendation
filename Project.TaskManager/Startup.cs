@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Project.Data.Context;
 using Project.Data.Repository;
+using Project.Service.Account;
 using Project.Service.MovieServices;
 using Project.TaskManager.Hangfire;
 using System;
@@ -101,6 +102,7 @@ namespace Project.TaskManager
         {
             services.AddScoped<IHangfireService, HangfireService>();
             services.AddScoped<IMovieService, MovieService>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Project.Service.Account;
 
 namespace Project.Api
 {
@@ -158,6 +159,10 @@ namespace Project.Api
         private void ServiceInjections(IServiceCollection services)
         {
             services.AddScoped<IMovieService, MovieService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<ITokenValidatorService, TokenValidatorService>();
+            services.AddScoped<ITokenStoreService, TokenStoreService>();
         }
     }
 }
