@@ -11,7 +11,8 @@ namespace Project.Business.MovieIntegration
     {
         private string _apiAddresss;
         private string _apiKey;
-        private const int MaximumMovie = 101;
+        private const int MaximumMovie = 1000;
+        private const int resultPageSize = 20; // api den dönen resultta sayfa başına gelen kayıt sayısı. değiştirilmeyecek.
 
         public MovieAPI(string apiAddress, string apiKey)
         {
@@ -20,61 +21,86 @@ namespace Project.Business.MovieIntegration
         }
 
 
-        private List<T> RequestPaginationResult<T>(string endPoint, int dataSize)
+        private string GetRestClientResponse(string uri)
         {
-            const int resultPageSize = 20; // api den dönen resultta sayfa başına gelen kayıt sayısı.
+            var client = new RestClient(uri);
+            client.Timeout = 10000; // 10000ms = 10s
 
-            var list = new List<T>();
+            var request = new RestRequest();
 
-            for (int i = 1; i <= (dataSize / resultPageSize) + (dataSize % resultPageSize != 0 ? 1 : 0); i++)
+            request.Parameters.Clear();
+            request.Method = Method.GET;
+            request.RequestFormat = DataFormat.Json;
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("cache-control", "no-cache");
+
+            return client.Execute(request).Content;
+        }
+
+        private MovieApiResultModel<T> RequestWithPage<T>(string endPoint, int page)
+        {
+            var uriBuilder = new UriBuilder(Path.Combine(_apiAddresss, endPoint));
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            query["api_key"] = _apiKey;
+            query["page"] = page.ToString();
+            uriBuilder.Query = query.ToString();
+
+            var response = GetRestClientResponse(uriBuilder.ToString());
+
+            var responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject<MovieApiResultModel<T>>(response);
+
+            return responseObject;
+        }
+
+
+
+        public List<MovieApiMovieModel> GetMovies()
+        {
+            var list = new List<MovieApiMovieModel>();
+
+            for (int i = 1; i <= (MaximumMovie / resultPageSize) + (MaximumMovie % resultPageSize != 0 ? 1 : 0); i++)
             {
-                var uriBuilder = new UriBuilder(Path.Combine(_apiAddresss, endPoint));
-                var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-                query["api_key"] = _apiKey;
-                query["page"] = i.ToString();
-                uriBuilder.Query = query.ToString();
+                Console.WriteLine($"page:{i}");
 
-                var client = new RestClient(uriBuilder.ToString());
-                client.Timeout = 5000; // 5000ms = 5s
+                var responseObject = RequestWithPage<MovieApiMovieModel>("discover/movie", i);
 
-                var request = new RestRequest();
-
-                request.Parameters.Clear();
-                request.Method = Method.GET;
-                request.RequestFormat = DataFormat.Json;
-                request.AddHeader("Content-Type", "application/json");
-                request.AddHeader("cache-control", "no-cache");
-
-                var response = client.Execute(request).Content;
-
-                var responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject<MovieApiResultModel<T>>(response);
                 list.AddRange(responseObject.results);
+
+                if (responseObject.results.Count == 0)
+                    break;
             }
 
-            list = list.Take(dataSize).ToList();
-
-            return list;
+            return list.Take(MaximumMovie).ToList();
         }
 
 
-        public List<MovieApiMovieModel> GetNowPlayingList()
+        public List<MovieApiMovieModel> GetUpcomingList(int page, out int totalResultsCount)
         {
-            var data = RequestPaginationResult<MovieApiMovieModel>("movie/now_playing", MaximumMovie);
-            return data;
-        }
-
-
-        public List<MovieApiMovieModel> GetUpcomingList()
-        {
-            var data = RequestPaginationResult<MovieApiMovieModel>("movie/upcoming", MaximumMovie);
-            return data;
+            var responseObject = RequestWithPage<MovieApiMovieModel>("movie/upcoming", page);
+            totalResultsCount = responseObject.total_results;
+            return responseObject.results;
         }
 
 
         public List<MovieApiMovieModel> GetTop10List()
         {
-            var data = RequestPaginationResult<MovieApiMovieModel>("movie/top_rated", 10);
-            return data;
+            var responseObject = RequestWithPage<MovieApiMovieModel>("movie/top_rated", 1);
+            return responseObject.results.Take(10).ToList();
+        }
+
+
+        public MovieApiMovieModel GetDetailById(int id)
+        {
+            var uriBuilder = new UriBuilder(Path.Combine(_apiAddresss, $"movie/{id}"));
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            query["api_key"] = _apiKey;
+            uriBuilder.Query = query.ToString();
+
+            var response = GetRestClientResponse(uriBuilder.ToString());
+
+            var responseObject = Newtonsoft.Json.JsonConvert.DeserializeObject<MovieApiMovieModel>(response);
+
+            return responseObject;
         }
     }
 }

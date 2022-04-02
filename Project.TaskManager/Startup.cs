@@ -11,6 +11,7 @@ using Project.Data.Context;
 using Project.Data.Repository;
 using Project.Service.Account;
 using Project.Service.MovieServices;
+using Project.Service.Security;
 using Project.TaskManager.Hangfire;
 using System;
 using System.Collections.Generic;
@@ -103,6 +104,9 @@ namespace Project.TaskManager
             services.AddScoped<IHangfireService, HangfireService>();
             services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<ITokenValidatorService, TokenValidatorService>();
+            services.AddScoped<ITokenStoreService, TokenStoreService>();
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Project.TaskManager.Hangfire
                 string apiUrl = this._configuration["TheMovieDbSettings:ApiUrl"];
                 string apiKey = this._configuration["TheMovieDbSettings:ApiKey"];
 
-                var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetNowPlayingList();
+                var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetMovies();
 
                 const int bulkInsertUpdateLimit = 500;
                 var insertList = new List<Movie>();

@@ -102,8 +102,7 @@ namespace Project.Service.Security
             var accessTokenHash = _securityService.GetSha256Hash(accessToken);
             var userToken = await this._userTokenRepository.FindAsync(
                 x => x.AccessTokenHash == accessTokenHash && x.UserId == userId).ConfigureAwait(false);
-            //return userToken.AccessTokenExpiresDateTime >= DateTime.UtcNow;
-            return userToken?.AccessTokenExpiresDateTime >= DateTime.UtcNow; // ismail değiştirdi
+            return userToken?.AccessTokenExpiresDateTime >= DateTime.UtcNow;
         }
 
 

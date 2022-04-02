@@ -26,7 +26,7 @@ namespace Project.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromBody] UserLoginDto model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login([FromBody] UserLoginDto model)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace Project.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto model, CancellationToken cancellationToken)
+        public IActionResult Register([FromBody] UserRegisterDto model)
         {
             try
             {
@@ -88,6 +88,23 @@ namespace Project.Api.Controllers
             {
                 throw;
             }
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("[action]")]
+        public async Task<IActionResult> RefreshToken(string refreshToken)
+        {
+            if (string.IsNullOrWhiteSpace(refreshToken))            
+                return BadRequest("refreshToken is not set.");            
+
+            var token = await _tokenStoreService.FindTokenAsync(refreshToken);
+
+            if (token == null || DateTime.UtcNow > token.RefreshTokenExpiresDateTime)            
+                return Ok(null);            
+
+            var (accessToken, newRefreshToken) = await _tokenStoreService.CreateJwtTokens(token.User).ConfigureAwait(false);
+            return Ok(new { access_token = accessToken, refresh_token = newRefreshToken });
         }
     }
 }
