@@ -14,4 +14,19 @@ namespace Project.Data.Dto.MovieDtos
 
         public DateTime InsertDateTime { get; set; }
     }
+
+    public class MovieNoteSaveDto
+    {
+        public int IntegrationId { get; set; }
+
+        public string Note { get; set; }
+    }
+
+
+    public class MovieScoreSaveDto
+    {
+        public int IntegrationId { get; set; }
+
+        public int Score { get; set; }
+    }
 }

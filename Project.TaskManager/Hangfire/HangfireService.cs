@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Project.Business.MovieIntegration;
 using Project.Common.Helpers;
 using Project.Data.Domain.MovieDomains;
 using Project.Data.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,12 +28,15 @@ namespace Project.TaskManager.Hangfire
         {
             try
             {
+                Console.WriteLine("SyncMovies job start");
                 var now = DateTime.Now;
 
                 string apiUrl = this._configuration["TheMovieDbSettings:ApiUrl"];
                 string apiKey = this._configuration["TheMovieDbSettings:ApiKey"];
 
                 var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetMovies();
+                //File.WriteAllText(@"d:\moviedata.json", JsonConvert.SerializeObject(data));
+                //var data = JsonConvert.DeserializeObject<List<MovieApiMovieModel>>(File.ReadAllText(@"d:\moviedata.json"));
 
                 const int bulkInsertUpdateLimit = 500;
                 var insertList = new List<Movie>();
@@ -50,7 +56,9 @@ namespace Project.TaskManager.Hangfire
                             OriginalTitle = item.original_title,
                             IntegrationId = item.id,
                             Overview = item.overview,
-                            InsertDateTime = now
+                            InsertDateTime = now,
+                            PosterImagePath = item.poster_path,
+                            BackDropImagePath = item.backdrop_path
                         });
 
 
@@ -70,6 +78,8 @@ namespace Project.TaskManager.Hangfire
                         entity.OriginalTitle = item.original_title;
                         entity.IntegrationId = item.id;
                         entity.Overview = item.overview;
+                        entity.BackDropImagePath = item.backdrop_path;
+                        entity.PosterImagePath = item.poster_path;
 
                         if (!GenericHelper.Compare<Movie>(tempEntity, entity))
                         {
@@ -98,6 +108,8 @@ namespace Project.TaskManager.Hangfire
                     this._movieRepository.UpdateRange(updateList);
                     updateList = new List<Movie>();
                 }
+
+                Console.WriteLine("SyncMovies job end");
             }
             catch (Exception err)
             {

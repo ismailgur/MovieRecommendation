@@ -10,6 +10,12 @@ namespace Project.Data.Dto.MovieDtos
     {
         public string Title { get; set; }
 
+        public string OriginalTitle { get; set; }
+
         public int IntegrationId { get; set; }
+
+        public string Image { get; set; }
+
+        public string TopImage { get; set; }
     }
 }

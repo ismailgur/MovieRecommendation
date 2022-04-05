@@ -29,6 +29,9 @@ namespace Project.Data.Repository
         void Save();
         Task<int> SaveAsync();
         T Update(T t, object key);
+
+        T Update(T t, object[] keys);
+
         Task<T> UpdateAsyn(T t, object key);
         bool UpdateRange(List<T> t);
         bool AddRange(List<T> t);

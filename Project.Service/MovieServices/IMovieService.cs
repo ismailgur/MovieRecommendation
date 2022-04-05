@@ -1,10 +1,6 @@
 ﻿using Project.Data.Domain.MovieDomains;
 using Project.Data.Dto.MovieDtos;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project.Service.MovieServices
 {
@@ -12,8 +8,14 @@ namespace Project.Service.MovieServices
     {
         MovieDetailDto GetMovieDetailByIntegrationId(long currentUserId, int id);
 
+        double? GetRateScoreAvg(long movieId);
+
         IList<MovieDto> GetTop10List();
 
         IList<MovieDto> GetUpcomingList(int pageIndex, out int totalCount);
+
+        MovieNote AddNoteByIntegrationId(long currentUserId, int integrationId, string note);
+
+        bool ScoreUpdate(long currentUserId, int integrationId, int score, out long movieId);
     }
 }

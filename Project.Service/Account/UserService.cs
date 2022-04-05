@@ -54,6 +54,12 @@ namespace Project.Service.Account
         }
 
 
+        public bool AnyUsername(string username)
+        {
+            return this._userRepository.GetAll().Any(x => x.Username == username);
+        }
+
+
         public User Insert(User model)
         {
             if (string.IsNullOrEmpty(model.Username))

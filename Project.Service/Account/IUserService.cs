@@ -15,6 +15,8 @@ namespace Project.Service.Account
 
         Task UpdateUserLastActivityDateAsync(User user);
 
+        bool AnyUsername(string username);
+
         User Insert(User model);
     }
 }

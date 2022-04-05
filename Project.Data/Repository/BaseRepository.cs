@@ -97,6 +97,21 @@ namespace Project.Data.Repository
             return exist;
         }
 
+
+        public virtual T Update(T t, object[] keys)
+        {
+            if (t == null)
+                return null;
+            T exist = _context.Set<T>().Find(keys);
+            if (exist != null)
+            {
+                _context.Entry(exist).CurrentValues.SetValues(t);
+                _context.SaveChanges();
+            }
+            return exist;
+        }
+
+
         public virtual async Task<T> UpdateAsyn(T t, object key)
         {
             if (t == null)

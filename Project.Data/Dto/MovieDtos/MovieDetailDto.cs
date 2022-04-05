@@ -14,6 +14,14 @@ namespace Project.Data.Dto.MovieDtos
 
         public string Title { get; set; }
 
+        public string OriginalTitle { get; set; }
+
+        public string Image { get; set; }
+
+        public string TopImage { get; set; }
+
+        public string Overview { get; set; }
+
         public double? RateScoreAvg { get; set; }
 
         public int? RateScore { get; set; }

@@ -1,8 +1,6 @@
 ﻿using Project.Data.Domain.MovieDomains;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Project.Data.Domain.Account
 {

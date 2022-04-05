@@ -23,5 +23,7 @@ namespace Project.Business.MovieIntegration
         public string poster_path { get; set; }
 
         public double popularity { get; set; }
+
+        public string backdrop_path { get; set; }
     }
 }

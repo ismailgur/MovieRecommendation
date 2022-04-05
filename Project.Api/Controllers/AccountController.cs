@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.Common.Helpers;
 using Project.Data.Domain.Account;
+using Project.Data.Dto;
 using Project.Data.Dto.Account;
 using Project.Service.Account;
 using Project.Service.Security;
@@ -28,26 +30,42 @@ namespace Project.Api.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto model)
         {
+            var resultModel = new RequestStateDto();
+
             try
             {
                 if (model == null)
-                    return BadRequest("user is not set.");
+                {
+                    resultModel.Description = "Hatalı işlem";
+                    return Ok(value: resultModel);
+                }
 
                 User user = await _userService.FindUserAsync(model.Username, model.Password).ConfigureAwait(false);
 
+                if (user == null)
+                {
+                    resultModel.Description = "Kullanıcı bulunamadı";
+                    return Ok(value: resultModel);
+                }
+
+
                 var (accessToken, refreshToken) = await _tokenStoreService.CreateJwtTokens(user).ConfigureAwait(false);
 
-                return Ok(new
+                resultModel.IsSuccess = true;
+                resultModel.Data = new
                 {
                     access_token = accessToken,
                     refresh_token = refreshToken,
                     user_id = user.Id,
                     display_name = $"{user.FirstName} {user.LastName}",
-                });
+                };
+
+                return Ok(value: resultModel);
             }
             catch (Exception err)
             {
-                throw;
+                resultModel.Description = DebugHelper.GetExceptionErrorMessage(err);
+                return Ok(value: resultModel);
             }
         }
 
@@ -56,18 +74,35 @@ namespace Project.Api.Controllers
         [HttpPost("[action]")]
         public IActionResult Register([FromBody] UserRegisterDto model)
         {
+            var resultModel = new RequestStateDto();
+
             try
             {
                 #region validation
 
                 if (model == null)
-                    return BadRequest("user is not set.");
+                {
+                    resultModel.Description = "Hatalı işlem";
+                    return Ok(value: resultModel);
+                }
 
                 if (string.IsNullOrEmpty(model.Username))
-                    return BadRequest("Kullanıcı adı bilgisi hatalı!");
+                {
+                    resultModel.Description = "Kullanıcı adı bilgisi hatalı";
+                    return Ok(value: resultModel);
+                }
 
                 if (string.IsNullOrEmpty(model.Password))
-                    return BadRequest("Şifre bilgisi hatalı!");
+                {
+                    resultModel.Description = "Şifre bilgisi hatalı";
+                    return Ok(value: resultModel);
+                }
+
+                if (this._userService.AnyUsername(model.Username))
+                {
+                    resultModel.Description = "Kullanıcı adı daha önce alınmış";
+                    return Ok(value: resultModel);
+                }
 
                 #endregion
 
@@ -81,12 +116,14 @@ namespace Project.Api.Controllers
                     Username = model.Username
                 });
 
+                resultModel.IsSuccess = true;
 
-                return Ok(value: true);
+                return Ok(value: resultModel);
             }
             catch (Exception err)
             {
-                throw;
+                resultModel.Description = DebugHelper.GetExceptionErrorMessage(err);
+                return Ok(value: resultModel);
             }
         }
 
@@ -95,13 +132,13 @@ namespace Project.Api.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> RefreshToken(string refreshToken)
         {
-            if (string.IsNullOrWhiteSpace(refreshToken))            
-                return BadRequest("refreshToken is not set.");            
+            if (string.IsNullOrWhiteSpace(refreshToken))
+                return BadRequest("refreshToken is not set.");
 
             var token = await _tokenStoreService.FindTokenAsync(refreshToken);
 
-            if (token == null || DateTime.UtcNow > token.RefreshTokenExpiresDateTime)            
-                return Ok(null);            
+            if (token == null || DateTime.UtcNow > token.RefreshTokenExpiresDateTime)
+                return Ok(null);
 
             var (accessToken, newRefreshToken) = await _tokenStoreService.CreateJwtTokens(token.User).ConfigureAwait(false);
             return Ok(new { access_token = accessToken, refresh_token = newRefreshToken });

@@ -16,6 +16,10 @@ namespace Project.Data.Domain.MovieDomains
 
         public string Overview { get; set; }
 
+        public string BackDropImagePath { get; set; }
+
+        public string PosterImagePath { get; set; }
+
 
         public DateTime InsertDateTime { get; set; }
 
