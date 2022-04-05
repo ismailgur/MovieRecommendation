@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Project.Data.Dto.MovieDtos;
-using System.IO;
+using Project.Common.CustomQuery;
 
 namespace Project.Service.MovieServices
 {
@@ -46,6 +46,23 @@ namespace Project.Service.MovieServices
             this.IntegrationCdnAddress = configuration["TheMovieDbSettings:CdnUrl"];
         }
         #endregion
+
+
+        public IPagedList<MovieDto> GetListPagination(int page, int pageSize)
+        {
+            var dtoQuery = this._movieRepository.GetAll().Where(x => !x.IsDeleted)
+                .OrderByDescending(x => x.Id)
+                .Select(x => new MovieDto
+                {
+                    Title = x.Title,
+                    OriginalTitle = x.OriginalTitle,
+                    IntegrationId = x.IntegrationId,
+                    Image = $"{this.IntegrationCdnAddress}{x.PosterImagePath}",
+                    TopImage = $"{this.IntegrationCdnAddress}{x.BackDropImagePath}",
+                });
+
+            return new PagedList<MovieDto>(dtoQuery, page, pageSize);
+        }
 
 
         public MovieDetailDto GetMovieDetailByIntegrationId(long currentUserId, int id)
@@ -102,7 +119,7 @@ namespace Project.Service.MovieServices
         public double? GetRateScoreAvg(long movieId)
         {
             var rates = this._movieRateRepository.GetAll().Where(r => r.MovieId == movieId).Select(x => x.Score).ToList();
-            return rates.Any() ? Math.Round(rates.Average(),1) : null;
+            return rates.Any() ? Math.Round(rates.Average(), 1) : null;
         }
 
 
@@ -111,6 +128,9 @@ namespace Project.Service.MovieServices
             var apiClient = new Business.MovieIntegration.MovieAPI(this.IntegrationApiUrl, this.IntegrationApiKey);
 
             var integrationData = apiClient.GetTop10List();
+
+            if (integrationData == null)
+                return null;
 
             var result = integrationData.Select(x => new MovieDto
             {
@@ -130,6 +150,31 @@ namespace Project.Service.MovieServices
             var apiClient = new Business.MovieIntegration.MovieAPI(this.IntegrationApiUrl, this.IntegrationApiKey);
 
             var integrationData = apiClient.GetUpcomingList(pageIndex, out totalCount);
+
+            if (integrationData == null)
+                return null;
+
+            var result = integrationData.Select(x => new MovieDto
+            {
+                Title = x.title,
+                OriginalTitle = x.original_title,
+                IntegrationId = x.id,
+                Image = $"{this.IntegrationCdnAddress}{x.poster_path}",
+                TopImage = $"{this.IntegrationCdnAddress}{x.backdrop_path}",
+            }).ToList();
+
+            return result;
+        }
+
+
+        public IList<MovieDto> GetRecommendationListByIntegrationId(int integrationId, int pageIndex, out int totalCount)
+        {
+            var apiClient = new Business.MovieIntegration.MovieAPI(this.IntegrationApiUrl, this.IntegrationApiKey);
+
+            var integrationData = apiClient.GetRecommendationList(pageIndex, integrationId, out totalCount);
+
+            if (integrationData == null)
+                return null;
 
             var result = integrationData.Select(x => new MovieDto
             {
@@ -172,7 +217,7 @@ namespace Project.Service.MovieServices
                 return false;
 
             var scoreEntity = this._movieRateRepository.GetAll().Where(r => r.MovieId == movieEntityId && r.UserId == currentUserId).SingleOrDefault();
-            
+
             if (scoreEntity == null)
             {
                 this._movieRateRepository.Add(new MovieRate { MovieId = movieEntityId, UserId = currentUserId, Score = score });
@@ -182,7 +227,7 @@ namespace Project.Service.MovieServices
                 if (scoreEntity.Score != score)
                 {
                     scoreEntity.Score = score;
-                    this._movieRateRepository.Update(scoreEntity, new object[] {currentUserId, movieEntityId });
+                    this._movieRateRepository.Update(scoreEntity, new object[] { currentUserId, movieEntityId });
                 }
             }
 

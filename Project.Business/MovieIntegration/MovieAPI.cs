@@ -102,5 +102,13 @@ namespace Project.Business.MovieIntegration
 
             return responseObject;
         }
+
+
+        public List<MovieApiMovieModel> GetRecommendationList(int page, int movie_id, out int totalResultsCount)
+        {
+            var responseObject = RequestWithPage<MovieApiMovieModel>($"movie/{movie_id}/recommendations", page);
+            totalResultsCount = responseObject.total_results;
+            return responseObject.results;
+        }
     }
 }
