@@ -1,4 +1,5 @@
 ﻿using Project.Data.Domain.Account;
+using Project.Data.Dto.Account;
 using Project.Data.Repository;
 using Project.Service.Security;
 using System;
@@ -19,6 +20,12 @@ namespace Project.Service.Account
         {
             this._userRepository = userRepository;
             this._securityService = securityService;
+        }
+
+
+        public User FindUser(long userId)
+        {
+            return _userRepository.GetAll().Where(x => !x.IsDeleted && x.Id == userId).SingleOrDefault();
         }
 
 
@@ -74,6 +81,40 @@ namespace Project.Service.Account
             model.InsertDateTime = DateTime.Now;
 
             return this._userRepository.Add(model);
+        }
+
+
+        public User Update(User entity, bool withPassword = false)
+        {
+            if (string.IsNullOrEmpty(entity.Username))
+                throw new Exception("Kullanıcı adı boş bırakılamaz!");
+
+            if (string.IsNullOrEmpty(entity.Password))
+                throw new Exception("Kullanıcı şifresi boş bırakılamaz!");
+
+            if (withPassword)
+            {
+                var passwordSalt = _securityService.GetSha256Hash(entity.Password);
+                entity.Password = passwordSalt;
+                entity.SerialNumber = Guid.NewGuid().ToString("N");
+            }
+
+            entity.UpdateDateTime = DateTime.Now;
+
+            return this._userRepository.Update(entity, entity.Id);
+        }
+
+
+        public UserDto GetDto(long id)
+        {
+            return this._userRepository.GetAll().Where(x => x.Id == id && !x.IsDeleted).Select(x => new UserDto
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                Email = x.Email,
+                Username = x.Username
+            })
+                .SingleOrDefault();
         }
     }
 }
