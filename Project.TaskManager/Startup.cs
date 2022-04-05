@@ -103,6 +103,7 @@ namespace Project.TaskManager
             services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<ITokenValidatorService, TokenValidatorService>();
             services.AddScoped<ITokenStoreService, TokenStoreService>();
+            services.AddScoped<Project.Service.Logging.ILogger, Project.Service.Logging.Logger>();
         }
     }
 }

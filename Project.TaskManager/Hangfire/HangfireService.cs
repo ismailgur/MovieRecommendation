@@ -4,6 +4,7 @@ using Project.Business.MovieIntegration;
 using Project.Common.Helpers;
 using Project.Data.Domain.MovieDomains;
 using Project.Data.Repository;
+using Project.Service.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,14 +15,25 @@ namespace Project.TaskManager.Hangfire
 {
     public class HangfireService : IHangfireService
     {
+        #region Injections
+
         private readonly IConfiguration _configuration;
         private readonly IRepository<Movie> _movieRepository;
+        private readonly ILogger _logger;
 
-        public HangfireService(IConfiguration configuration, IRepository<Movie> movieRepository)
+        #endregion
+
+
+        #region ctor
+
+        public HangfireService(IConfiguration configuration, IRepository<Movie> movieRepository, ILogger logger)
         {
             this._configuration = configuration;
             this._movieRepository = movieRepository;
+            this._logger = logger;
         }
+
+        #endregion
 
 
         public async Task SyncMovies()

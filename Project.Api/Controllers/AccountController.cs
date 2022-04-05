@@ -5,9 +5,9 @@ using Project.Data.Domain.Account;
 using Project.Data.Dto;
 using Project.Data.Dto.Account;
 using Project.Service.Account;
+using Project.Service.Logging;
 using Project.Service.Security;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project.Api.Controllers
@@ -16,14 +16,25 @@ namespace Project.Api.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
+        #region Injections
+
         private readonly IUserService _userService;
         private readonly ITokenStoreService _tokenStoreService;
+        private readonly ILogger _logger;
 
-        public AccountController(IUserService userService, ITokenStoreService tokenStoreService)
+        #endregion
+
+
+        #region ctor
+
+        public AccountController(IUserService userService, ITokenStoreService tokenStoreService, ILogger logger)
         {
             this._userService = userService;
             this._tokenStoreService = tokenStoreService;
+            this._logger = logger;
         }
+
+        #endregion
 
 
         [AllowAnonymous]

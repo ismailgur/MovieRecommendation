@@ -5,6 +5,7 @@ using Project.Common.Helpers;
 using Project.Data.Dto;
 using Project.Data.Dto.Account;
 using Project.Service.Account;
+using Project.Service.Logging;
 using System;
 
 namespace Project.Api.Controllers
@@ -14,12 +15,23 @@ namespace Project.Api.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        #region Injections
 
-        public UserController(IUserService userService)
+        private readonly IUserService _userService;
+        private readonly ILogger _logger;
+
+        #endregion
+
+
+        #region ctor
+
+        public UserController(IUserService userService, ILogger logger)
         {
             this._userService = userService;
+            this._logger = logger;
         }
+
+        #endregion
 
 
         [HttpGet("[action]")]

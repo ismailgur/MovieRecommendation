@@ -11,7 +11,7 @@ namespace Project.Service.MovieServices
 {
     public class MovieService : IMovieService
     {
-        #region Declaretions
+        #region Declarations
 
         private string IntegrationApiUrl;
         private string IntegrationApiKey;

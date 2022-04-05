@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Project.Common.Extensions;
 using Project.Data.Dto;
 using Project.Data.Dto.MovieDtos;
+using Project.Service.Logging;
 using Project.Service.MovieServices;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,13 +18,23 @@ namespace Project.Api.Controllers
     [EnableCors("CorsPolicy")]
     public class MovieController : ControllerBase
     {
+        #region Injections
+
         private readonly IMovieService _movieService;
+        private readonly ILogger _logger;
+
+        #endregion
 
 
-        public MovieController(IMovieService movieService)
+        #region ctor
+
+        public MovieController(IMovieService movieService, ILogger logger)
         {
             this._movieService = movieService;
+            this._logger = logger;
         }
+
+        #endregion
 
 
         [HttpGet("[action]")]

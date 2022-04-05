@@ -3,24 +3,30 @@ using Project.Data.Dto.Account;
 using Project.Data.Repository;
 using Project.Service.Security;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Project.Service.Account
 {
     public class UserService : IUserService
     {
+        #region Injections
+
         private readonly IRepository<User> _userRepository;
         private readonly ISecurityService _securityService;
 
+        #endregion
+
+
+        #region ctor
 
         public UserService(IRepository<User> userRepository, ISecurityService securityService)
         {
             this._userRepository = userRepository;
             this._securityService = securityService;
         }
+
+        #endregion
 
 
         public User FindUser(long userId)
