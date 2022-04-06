@@ -43,6 +43,16 @@ namespace Project.Api
                 });
             });
 
+
+            #region DatabaseEnsureCreate
+
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            new ApplicationDbContext(optionsBuilder.Options).Database.EnsureCreated();
+
+            #endregion
+
+
             services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
 
             ServiceInjections(services);

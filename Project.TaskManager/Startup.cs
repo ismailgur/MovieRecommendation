@@ -30,10 +30,10 @@ namespace Project.TaskManager
         {
             #region Configure Hangfire  
             services.AddHangfire(x => x.UseRecommendedSerializerSettings().UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });            
             services.AddHangfireServer(opt =>
             {
-                opt.WorkerCount = 1;
+                opt.WorkerCount = 1;                
             });
             #endregion
 
@@ -47,6 +47,16 @@ namespace Project.TaskManager
                     sqlServerOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
             });
+
+
+            #region DatabaseEnsureCreate
+
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            new ApplicationDbContext(optionsBuilder.Options).Database.EnsureCreated(); 
+            
+            #endregion
+
 
             services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
 
