@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Project.Business.MovieIntegration;
 using Project.Common.Helpers;
 using Project.Data.Domain.MovieDomains;
 using Project.Data.Repository;
 using Project.Service.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,8 +37,9 @@ namespace Project.TaskManager.Hangfire
         {
             try
             {
-                Console.WriteLine("SyncMovies job start");
                 var now = DateTime.Now;
+                
+                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job started");
 
                 string apiUrl = this._configuration["TheMovieDbSettings:ApiUrl"];
                 string apiKey = this._configuration["TheMovieDbSettings:ApiKey"];
@@ -49,6 +47,8 @@ namespace Project.TaskManager.Hangfire
                 var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetMovies();
                 //File.WriteAllText(@"d:\moviedata.json", JsonConvert.SerializeObject(data));
                 //var data = JsonConvert.DeserializeObject<List<MovieApiMovieModel>>(File.ReadAllText(@"d:\moviedata.json"));
+
+                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", $"Api data ready {data.Count}");
 
                 const int bulkInsertUpdateLimit = 500;
                 var insertList = new List<Movie>();
@@ -121,13 +121,18 @@ namespace Project.TaskManager.Hangfire
                     updateList = new List<Movie>();
                 }
 
-                Console.WriteLine("SyncMovies job end");
+                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Sync success");
             }
             catch (Exception err)
             {
                 var msg = DebugHelper.GetExceptionErrorMessage(err);
+                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Error, "SyncMovies job", msg);
+
                 throw;
             }
+
+
+            this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job finished");
         }
     }
 }
