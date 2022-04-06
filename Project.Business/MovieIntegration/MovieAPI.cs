@@ -1,8 +1,8 @@
-﻿using RestSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Web;
 
 namespace Project.Business.MovieIntegration
@@ -23,18 +23,18 @@ namespace Project.Business.MovieIntegration
 
         private string GetRestClientResponse(string uri)
         {
-            var client = new RestClient(uri);
-            client.Timeout = 10000; // 10000ms = 10s
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10); // 10000ms = 10s
 
-            var request = new RestRequest();
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
-            request.Parameters.Clear();
-            request.Method = Method.GET;
-            request.RequestFormat = DataFormat.Json;
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("cache-control", "no-cache");
+            request.Headers.Add("cache-control", "no-cache");
+            request.Headers.Add("Accept", "application/json");
 
-            return client.Execute(request).Content;
+            var response = client.Send(request);
+            var result = response.Content.ReadAsStringAsync().Result;
+
+            return result;
         }
 
         private MovieApiResultModel<T> RequestWithPage<T>(string endPoint, int page)
