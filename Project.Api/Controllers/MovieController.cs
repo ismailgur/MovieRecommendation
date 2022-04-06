@@ -60,11 +60,16 @@ namespace Project.Api.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetListPagination(int pageIndex, int pageSize, CancellationToken cancellationToken)
         {
-            var list = this._movieService.GetListPagination(pageIndex, pageSize);
+            return await Task.Run(() =>
+            {
+                Thread.Sleep(10000);
 
-            var response = new { data = list, totalElements = list.TotalCount };
+                var list = this._movieService.GetListPagination(pageIndex, pageSize);
 
-            return Ok(value: response);
+                var response = new { data = list, totalElements = list.TotalCount };
+
+                return Ok(value: response);
+            }, cancellationToken);
         }
 
 
