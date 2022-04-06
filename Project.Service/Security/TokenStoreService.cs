@@ -111,7 +111,8 @@ namespace Project.Service.Security
             var now = DateTimeOffset.UtcNow;
             var accessTokenExpiresDateTime = now.AddMinutes(_configuration.Value.AccessTokenExpirationMinutes);
             var refreshTokenExpiresDateTime = now.AddMinutes(_configuration.Value.RefreshTokenExpirationMinutes);
-            var accessToken = await createAccessTokenAsync(user, accessTokenExpiresDateTime.UtcDateTime).ConfigureAwait(false);
+            //var accessToken = await createAccessTokenAsync(user, accessTokenExpiresDateTime.UtcDateTime).ConfigureAwait(false);
+            var accessToken = createAccessToken(user, accessTokenExpiresDateTime.UtcDateTime);
             var refreshToken = Guid.NewGuid().ToString().Replace("-", "");
 
             await AddUserTokenAsync(user, refreshToken, accessToken, refreshTokenExpiresDateTime, accessTokenExpiresDateTime).ConfigureAwait(false);
@@ -120,7 +121,7 @@ namespace Project.Service.Security
         }
 
 
-        private async Task<string> createAccessTokenAsync(User user, DateTime expires)
+        private string createAccessToken(User user, DateTime expires)
         {
             var claims = new List<Claim>
             {
