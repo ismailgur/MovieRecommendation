@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Project.Service.Account;
 using Project.Api.Filters.ExceptionFilters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Project.Api
 {
@@ -111,7 +112,14 @@ namespace Project.Api
             {
                 configure.Filters.Add<OperationCancelledExceptionFilter>();
             });
-            
+
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true; // This is the setting
+            });
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Project.Api", Version = "v1" });

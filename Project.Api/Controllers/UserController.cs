@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.Api.Helpers;
 using Project.Common.Extensions;
 using Project.Common.Helpers;
 using Project.Data.Dto;
@@ -57,6 +58,13 @@ namespace Project.Api.Controllers
                 if (model == null)
                 {
                     resultModel.Description = "Hatalı işlem";
+                    return Ok(value: resultModel);
+                }
+
+
+                if (!ModelState.IsValid)
+                {
+                    resultModel.Description = string.Join(",", ActionHelper.GetErrorListFromModelState(ModelState));
                     return Ok(value: resultModel);
                 }
 

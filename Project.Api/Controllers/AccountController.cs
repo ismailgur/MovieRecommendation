@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project.Api.Helpers;
 using Project.Common.Helpers;
 using Project.Data.Domain.Account;
 using Project.Data.Dto;
@@ -85,7 +86,7 @@ namespace Project.Api.Controllers
         [HttpPost("[action]")]
         public IActionResult Register([FromBody] UserRegisterDto model)
         {
-            var resultModel = new RequestStateDto();
+            var resultModel = new RequestStateDto();            
 
             try
             {
@@ -97,21 +98,9 @@ namespace Project.Api.Controllers
                     return Ok(value: resultModel);
                 }
 
-                if (string.IsNullOrEmpty(model.Username))
+                if (!ModelState.IsValid)
                 {
-                    resultModel.Description = "Kullanıcı adı bilgisi hatalı";
-                    return Ok(value: resultModel);
-                }
-
-                if (string.IsNullOrEmpty(model.Password))
-                {
-                    resultModel.Description = "Şifre bilgisi hatalı";
-                    return Ok(value: resultModel);
-                }
-
-                if (this._userService.AnyUsername(model.Username))
-                {
-                    resultModel.Description = "Kullanıcı adı daha önce alınmış";
+                    resultModel.Description = string.Join(",", ActionHelper.GetErrorListFromModelState(ModelState));
                     return Ok(value: resultModel);
                 }
 
