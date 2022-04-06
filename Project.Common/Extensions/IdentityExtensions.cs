@@ -20,7 +20,7 @@ namespace Project.Common.Extensions
                     UserId = userId,
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

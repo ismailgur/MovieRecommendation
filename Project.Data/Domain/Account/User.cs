@@ -28,6 +28,8 @@ namespace Project.Data.Domain.Account
 
         public DateTime? UpdateDateTime { get; set; }
 
+        public DateTimeOffset? LastLoggedIn { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<MovieRate> MovieRates { get; set; }

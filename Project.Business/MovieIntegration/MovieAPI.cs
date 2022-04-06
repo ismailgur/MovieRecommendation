@@ -11,7 +11,7 @@ namespace Project.Business.MovieIntegration
     {
         private string _apiAddresss;
         private string _apiKey;
-        private const int MaximumMovie = 100;
+        private const int MaximumMovie = 1000;
         private const int resultPageSize = 20; // api den dönen resultta sayfa başına gelen kayıt sayısı. değiştirilmeyecek.
 
         public MovieAPI(string apiAddress, string apiKey)
