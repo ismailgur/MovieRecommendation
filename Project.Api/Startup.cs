@@ -48,7 +48,7 @@ namespace Project.Api
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            new ApplicationDbContext(optionsBuilder.Options).Database.EnsureCreated();
+            new ApplicationDbContext(optionsBuilder.Options).Database.Migrate();
 
             #endregion
 
