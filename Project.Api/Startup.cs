@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Project.Service.Account;
+using Project.Api.Filters.ExceptionFilters;
 
 namespace Project.Api
 {
@@ -106,7 +107,10 @@ namespace Project.Api
                       )
                   );
 
-            services.AddControllers();
+            services.AddControllers(configure=>
+            {
+                configure.Filters.Add<OperationCancelledExceptionFilter>();
+            });
             
             services.AddSwaggerGen(c =>
             {
