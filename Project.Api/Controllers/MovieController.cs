@@ -49,11 +49,14 @@ namespace Project.Api.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetUpcomingListPagination(int pageIndex, CancellationToken cancellationToken)
         {
-            var data = this._movieService.GetUpcomingList(pageIndex + 1, out int totalCount);
+            return await Task.Run(() =>
+            {
+                var data = this._movieService.GetUpcomingList(pageIndex + 1, out int totalCount);
 
-            var res = new { data = data, totalElements = totalCount };
+                var res = new { data = data, totalElements = totalCount };
 
-            return Ok(res);
+                return Ok(res);
+            }, cancellationToken);
         }
 
 
@@ -62,8 +65,6 @@ namespace Project.Api.Controllers
         {
             return await Task.Run(() =>
             {
-                Thread.Sleep(10000);
-
                 var list = this._movieService.GetListPagination(pageIndex, pageSize);
 
                 var response = new { data = list, totalElements = list.TotalCount };
@@ -76,11 +77,14 @@ namespace Project.Api.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetRecommendationListByIntegrationId(int integrationId, int pageIndex, CancellationToken cancellationToken)
         {
-            var data = this._movieService.GetRecommendationListByIntegrationId(integrationId, pageIndex + 1, out int totalCount);
+            return await Task.Run(() =>
+            {
+                var data = this._movieService.GetRecommendationListByIntegrationId(integrationId, pageIndex + 1, out int totalCount);
 
-            var res = new { data = data, totalElements = totalCount };
+                var res = new { data = data, totalElements = totalCount };
 
-            return Ok(value: res);
+                return Ok(value: res);
+            }, cancellationToken);
         }
 
 
