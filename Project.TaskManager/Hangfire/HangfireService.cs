@@ -35,104 +35,107 @@ namespace Project.TaskManager.Hangfire
 
         public async Task SyncMovies()
         {
-            try
+            await Task.Run(() =>
             {
-                var now = DateTime.Now;
-                
-                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job started");
-
-                string apiUrl = this._configuration["TheMovieDbSettings:ApiUrl"];
-                string apiKey = this._configuration["TheMovieDbSettings:ApiKey"];
-
-                var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetMovies();
-                //File.WriteAllText(@"d:\moviedata.json", JsonConvert.SerializeObject(data));
-                //var data = JsonConvert.DeserializeObject<List<MovieApiMovieModel>>(File.ReadAllText(@"d:\moviedata.json"));
-
-                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", $"Api data ready {data.Count}");
-
-                const int bulkInsertUpdateLimit = 500;
-                var insertList = new List<Movie>();
-                var updateList = new List<Movie>();
-
-
-                foreach (var item in data)
+                try
                 {
-                    var entity = this._movieRepository.GetAll().Where(x => x.IntegrationId == item.id && !x.IsDeleted).OrderBy(x => x.Id).LastOrDefault();
+                    var now = DateTime.Now;
 
-                    // Ekle
-                    if (entity == null)
+                    this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job started");
+
+                    string apiUrl = this._configuration["TheMovieDbSettings:ApiUrl"];
+                    string apiKey = this._configuration["TheMovieDbSettings:ApiKey"];
+
+                    var data = new Business.MovieIntegration.MovieAPI(apiUrl, apiKey).GetMovies();
+                    //File.WriteAllText(@"d:\moviedata.json", JsonConvert.SerializeObject(data));
+                    //var data = JsonConvert.DeserializeObject<List<MovieApiMovieModel>>(File.ReadAllText(@"d:\moviedata.json"));
+
+                    this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", $"Api data ready {data.Count}");
+
+                    const int bulkInsertUpdateLimit = 500;
+                    var insertList = new List<Movie>();
+                    var updateList = new List<Movie>();
+
+
+                    foreach (var item in data)
                     {
-                        insertList.Add(new Movie
+                        var entity = this._movieRepository.GetAll().Where(x => x.IntegrationId == item.id && !x.IsDeleted).OrderBy(x => x.Id).LastOrDefault();
+
+                        // Ekle
+                        if (entity == null)
                         {
-                            Title = item.title,
-                            OriginalTitle = item.original_title,
-                            IntegrationId = item.id,
-                            Overview = item.overview,
-                            InsertDateTime = now,
-                            PosterImagePath = item.poster_path,
-                            BackDropImagePath = item.backdrop_path
-                        });
-
-
-                        if (insertList.Count >= bulkInsertUpdateLimit)
-                        {
-                            this._movieRepository.AddRange(insertList);
-                            insertList = new List<Movie>();
-                        }
-                    }
-
-                    // Güncelle
-                    else
-                    {
-                        var tempEntity = GenericHelper.Clone<Movie>(entity);
-
-                        entity.Title = item.title;
-                        entity.OriginalTitle = item.original_title;
-                        entity.IntegrationId = item.id;
-                        entity.Overview = item.overview;
-                        entity.BackDropImagePath = item.backdrop_path;
-                        entity.PosterImagePath = item.poster_path;
-
-                        if (!GenericHelper.Compare<Movie>(tempEntity, entity))
-                        {
-                            entity.UpdateDateTime = now;
-
-                            updateList.Add(entity);
-
-                            if (updateList.Count >= bulkInsertUpdateLimit)
+                            insertList.Add(new Movie
                             {
-                                this._movieRepository.UpdateRange(insertList);
-                                updateList = new List<Movie>();
+                                Title = item.title,
+                                OriginalTitle = item.original_title,
+                                IntegrationId = item.id,
+                                Overview = item.overview,
+                                InsertDateTime = now,
+                                PosterImagePath = item.poster_path,
+                                BackDropImagePath = item.backdrop_path
+                            });
+
+
+                            if (insertList.Count >= bulkInsertUpdateLimit)
+                            {
+                                this._movieRepository.AddRange(insertList);
+                                insertList = new List<Movie>();
                             }
                         }
 
+                        // Güncelle
+                        else
+                        {
+                            var tempEntity = GenericHelper.Clone<Movie>(entity);
+
+                            entity.Title = item.title;
+                            entity.OriginalTitle = item.original_title;
+                            entity.IntegrationId = item.id;
+                            entity.Overview = item.overview;
+                            entity.BackDropImagePath = item.backdrop_path;
+                            entity.PosterImagePath = item.poster_path;
+
+                            if (!GenericHelper.Compare<Movie>(tempEntity, entity))
+                            {
+                                entity.UpdateDateTime = now;
+
+                                updateList.Add(entity);
+
+                                if (updateList.Count >= bulkInsertUpdateLimit)
+                                {
+                                    this._movieRepository.UpdateRange(insertList);
+                                    updateList = new List<Movie>();
+                                }
+                            }
+
+                        }
                     }
-                }
 
-                if (insertList.Count != 0)
+                    if (insertList.Count != 0)
+                    {
+                        this._movieRepository.AddRange(insertList);
+                        insertList = new List<Movie>();
+                    }
+
+                    if (updateList.Count != 0)
+                    {
+                        this._movieRepository.UpdateRange(updateList);
+                        updateList = new List<Movie>();
+                    }
+
+                    this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Sync success");
+                }
+                catch (Exception err)
                 {
-                    this._movieRepository.AddRange(insertList);
-                    insertList = new List<Movie>();
+                    var msg = DebugHelper.GetExceptionErrorMessage(err);
+                    this._logger.InsertLog(Data.Domain.Logging.LogLevel.Error, "SyncMovies job", msg);
+
+                    throw;
                 }
 
-                if (updateList.Count != 0)
-                {
-                    this._movieRepository.UpdateRange(updateList);
-                    updateList = new List<Movie>();
-                }
 
-                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Sync success");
-            }
-            catch (Exception err)
-            {
-                var msg = DebugHelper.GetExceptionErrorMessage(err);
-                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Error, "SyncMovies job", msg);
-
-                throw;
-            }
-
-
-            this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job finished");
+                this._logger.InsertLog(Data.Domain.Logging.LogLevel.Debug, "SyncMovies job", "Job finished");
+            });
         }
     }
 }
