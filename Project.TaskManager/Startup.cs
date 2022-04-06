@@ -31,6 +31,10 @@ namespace Project.TaskManager
             #region Configure Hangfire  
             services.AddHangfire(x => x.UseRecommendedSerializerSettings().UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+            services.AddHangfireServer(opt =>
+            {
+                opt.WorkerCount = 1;
+            });
             #endregion
 
 
@@ -58,14 +62,7 @@ namespace Project.TaskManager
             }
 
 
-            #region Configure Hangfire             
-
-            var options = new BackgroundJobServerOptions
-            {
-                WorkerCount = 1
-            };
-
-            app.UseHangfireServer(options);
+            #region Configure Hangfire      
 
             app.UseHangfireDashboard("/hfdashboard",
                new DashboardOptions()
